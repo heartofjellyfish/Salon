@@ -1,0 +1,242 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
+}
+
+/*
+ * Light-mood variables are registered with @property so that switching moods
+ * (daylight / evening / spotlight) interpolates smoothly — gradients and text
+ * colors re-render each frame as these values tween, rather than snapping.
+ */
+@property --wall-top { syntax: "<color>"; inherits: true; initial-value: #efe9e0; }
+@property --wall-bottom { syntax: "<color>"; inherits: true; initial-value: #e3dac9; }
+@property --floor-top { syntax: "<color>"; inherits: true; initial-value: #b89c75; }
+@property --floor-bottom { syntax: "<color>"; inherits: true; initial-value: #8c6f4c; }
+@property --baseboard { syntax: "<color>"; inherits: true; initial-value: #ddd2c0; }
+@property --ambient { syntax: "<color>"; inherits: true; initial-value: #f3eee4; }
+@property --glow-color { syntax: "<color>"; inherits: true; initial-value: #fcf7ec; }
+@property --glow-a { syntax: "<number>"; inherits: true; initial-value: 0.55; }
+@property --glow-x { syntax: "<percentage>"; inherits: true; initial-value: 30%; }
+@property --glow-y { syntax: "<percentage>"; inherits: true; initial-value: 18%; }
+@property --glow-r { syntax: "<percentage>"; inherits: true; initial-value: 62%; }
+@property --vignette-a { syntax: "<number>"; inherits: true; initial-value: 0.08; }
+@property --ui-ink { syntax: "<color>"; inherits: true; initial-value: #4a4034; }
+@property --ui-ink-soft { syntax: "<color>"; inherits: true; initial-value: #6f6453; }
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ambient);
+  color: #2b2620;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(120, 104, 80, 0.25);
+}
+
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ui-ink) 60%, transparent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---- Light moods ---------------------------------------------------------- */
+
+[data-light="daylight"] {
+  --wall-top: #efe9e0;
+  --wall-bottom: #e3dac9;
+  --floor-top: #b89c75;
+  --floor-bottom: #8c6f4c;
+  --baseboard: #ddd2c0;
+  --ambient: #f3eee4;
+  --glow-color: #fcf7ec;
+  --glow-a: 0.55;
+  --glow-x: 30%;
+  --glow-y: 18%;
+  --glow-r: 64%;
+  --vignette-a: 0.08;
+  --ui-ink: #4a4034;
+  --ui-ink-soft: #7a6e5c;
+}
+
+[data-light="evening"] {
+  --wall-top: #4b4138;
+  --wall-bottom: #322b25;
+  --floor-top: #5a4632;
+  --floor-bottom: #2c2218;
+  --baseboard: #3a3128;
+  --ambient: #241f1b;
+  --glow-color: #f4cd92;
+  --glow-a: 0.5;
+  --glow-x: 27%;
+  --glow-y: 60%;
+  --glow-r: 52%;
+  --vignette-a: 0.34;
+  --ui-ink: #ede2cf;
+  --ui-ink-soft: #b6a98f;
+}
+
+[data-light="spotlight"] {
+  --wall-top: #1d1b18;
+  --wall-bottom: #100f0e;
+  --floor-top: #1a1613;
+  --floor-bottom: #090807;
+  --baseboard: #14110e;
+  --ambient: #0c0b0a;
+  --glow-color: #fff6e2;
+  --glow-a: 0.72;
+  --glow-x: 50%;
+  --glow-y: 32%;
+  --glow-r: 42%;
+  --vignette-a: 0.5;
+  --ui-ink: #ece6db;
+  --ui-ink-soft: #9b9486;
+}
+
+/* ---- Room surfaces -------------------------------------------------------- */
+
+.stage {
+  background: var(--ambient);
+  color: var(--ui-ink);
+  transition:
+    --wall-top 1200ms ease, --wall-bottom 1200ms ease,
+    --floor-top 1200ms ease, --floor-bottom 1200ms ease,
+    --baseboard 1200ms ease, --ambient 1200ms ease,
+    --glow-color 1200ms ease, --glow-a 1200ms ease,
+    --glow-x 1200ms ease, --glow-y 1200ms ease, --glow-r 1200ms ease,
+    --vignette-a 1200ms ease, --ui-ink 1200ms ease, --ui-ink-soft 1200ms ease;
+}
+
+.room-wall {
+  background: linear-gradient(177deg, var(--wall-top) 0%, var(--wall-bottom) 100%);
+}
+
+.room-glow {
+  background: radial-gradient(
+    var(--glow-r) var(--glow-r) at var(--glow-x) var(--glow-y),
+    var(--glow-color),
+    transparent 72%
+  );
+  opacity: var(--glow-a);
+}
+
+/* a faint vertical wash, like light spilling from an off-frame window */
+.room-window {
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--glow-color) 26%, transparent) 0%,
+    transparent 34%
+  );
+  opacity: calc(var(--glow-a) * 0.7);
+}
+
+.room-floor {
+  background:
+    repeating-linear-gradient(
+      94deg,
+      transparent 0,
+      transparent 78px,
+      rgba(0, 0, 0, 0.05) 78px,
+      rgba(0, 0, 0, 0.05) 80px
+    ),
+    linear-gradient(180deg, var(--floor-top) 0%, var(--floor-bottom) 100%);
+}
+
+.room-baseboard {
+  background: linear-gradient(180deg, var(--baseboard), color-mix(in srgb, var(--baseboard) 70%, #000));
+}
+
+.room-floor-sheen {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--glow-color) 30%, transparent) 0%,
+    transparent 60%
+  );
+  opacity: calc(var(--glow-a) * 0.55);
+}
+
+.room-vignette {
+  background: radial-gradient(125% 105% at 50% 36%, transparent 52%, rgba(0, 0, 0, var(--vignette-a)) 100%);
+}
+
+.room-grain {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='160'%20height='160'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.8'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='saturate'%20values='0'/%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  mix-blend-mode: soft-light;
+}
+
+/* ---- Frosted museum-label / curator panel --------------------------------- */
+
+.panel {
+  background: color-mix(in srgb, #f7f2e9 82%, transparent);
+  border: 1px solid color-mix(in srgb, #ffffff 45%, transparent);
+  color: #2b2620;
+  backdrop-filter: blur(10px) saturate(1.05);
+  -webkit-backdrop-filter: blur(10px) saturate(1.05);
+  box-shadow: 0 18px 50px -28px rgba(0, 0, 0, 0.5);
+}
+
+/* The room dollies in and dims when a painting is opened (the viewer's backdrop
+   supplies the blur). CSS-driven so it reliably reverts when the viewer closes. */
+.camera {
+  transform-origin: center 42%;
+  transform: scale(1);
+  filter: brightness(1);
+  transition:
+    transform 720ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 720ms ease;
+}
+.camera[data-viewing="true"] {
+  transform: scale(1.045);
+  filter: brightness(0.82);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+.text-pretty {
+  text-wrap: pretty;
+}
+
+/* On touch devices there is no hover, so reveal the museum labels by default. */
+@media (hover: none) {
+  .label-on-touch {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes viewerFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Respect users who prefer less motion: neutralize transitions/animations. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
